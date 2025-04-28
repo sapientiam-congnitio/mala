@@ -6,12 +6,12 @@ import torch
 import json
 import time
 
-benchmark_dataset_path = "/gpfs/helios/home/manuchek/mala/data/train_valid_test_data/test/data-00000-of-00001.arrow"
+benchmark_dataset_path = ""  # benchmark data path
 model_name = "microsoft/deberta-v3-base"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-with open("/gpfs/helios/home/manuchek/mala/data/classes.json") as file:
+with open("") as file:  # classes path
     classes = json.load(file)["data"]
 
 
@@ -58,10 +58,10 @@ def preprocess(example, tokenizer):
 dataset = Dataset.from_file(benchmark_dataset_path)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model_teacher = AutoModelForSequenceClassification.from_pretrained(
-    "/gpfs/helios/home/manuchek/mala/data/teacher_models/20-epochs/checkpoint-72460"
+    ""  # teacher model path
 )
 model_student = AutoModelForSequenceClassification.from_pretrained(
-    "/gpfs/helios/home/manuchek/mala/data/best_student"
+    ""  # student model path
 )
 
 model_teacher.to(device)

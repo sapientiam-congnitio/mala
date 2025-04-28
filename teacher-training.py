@@ -11,7 +11,7 @@ import evaluate
 import numpy as np
 import torch
 
-with open("/gpfs/helios/home/manuchek/mala/data/classes.json") as file:
+with open("") as file:  # teacher model path
     classes = json.load(file)["data"]
 
 class2id = {class_: id for id, class_ in enumerate(classes)}
@@ -40,8 +40,8 @@ def preprocess_function(example):
     return encoding
 
 
-train_file = "/gpfs/helios/home/manuchek/mala/data/train_valid_test_data/train/data-00000-of-00001.arrow"
-valid_file = "/gpfs/helios/home/manuchek/mala/data/train_valid_test_data/valid/data-00000-of-00001.arrow"
+train_file = ""  # training dataset path
+valid_file = ""  # validation dataset path
 
 
 ds_train = Dataset.from_file(train_file)
@@ -83,7 +83,7 @@ model = AutoModelForSequenceClassification.from_pretrained(
 )
 
 training_args = TrainingArguments(
-    output_dir="/gpfs/helios/home/manuchek/mala/data/teacher_models/20-epochs",
+    output_dir="",  # trained teacher model path
     learning_rate=2e-5,
     per_device_train_batch_size=64,
     per_device_eval_batch_size=64,

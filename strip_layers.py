@@ -1,5 +1,4 @@
 import re
-
 from transformers import AutoModelForSequenceClassification, AutoConfig, AutoTokenizer
 import torch
 
@@ -38,9 +37,7 @@ def get_layer_prefix(key):
 
 
 def verify_layer_equality(original_model, stripped_model, layers_to_remove):
-    """
-    Verify that the remaining layers in the stripped model are identical to the original.
-    """
+
     original_dict = original_model.state_dict()
     stripped_dict = stripped_model.state_dict()
 
@@ -64,17 +61,15 @@ def verify_layer_equality(original_model, stripped_model, layers_to_remove):
         print(f"Current key: {key}")
         layer_num = extract_layer_num(key)
         if layer_num is not None and layer_num not in layers_to_remove:
-            # Get the layer prefix for this architecture
+
             prefix = get_layer_prefix(key)
             if prefix is None:
                 continue
 
-            # Map to new layer number
             new_layer_num = layer_map[layer_num]
             new_key = re.sub(f"{prefix}{layer_num}", f"{prefix}{new_layer_num}", key)
             print("dlsjfaldks", new_layer_num)
 
-            # Compare weights
             if new_key in stripped_dict:
                 original_weights = original_dict[key]
                 stripped_weights = stripped_dict[new_key]
@@ -104,14 +99,11 @@ def strip_transformer_layers(
     if layers_to_remove is None and keep_first_n is None:
         raise ValueError("Must specify either layers_to_remove or keep_first_n")
 
-    # Load the model configuration
     config = AutoConfig.from_pretrained(model_name)
 
-    # Set number of labels if specified
     if num_labels is not None:
         config.num_labels = num_labels
 
-    # Determine total number of layers
     if hasattr(config, "num_hidden_layers"):
         total_layers = config.num_hidden_layers
         layer_attr = "num_hidden_layers"
@@ -137,7 +129,6 @@ def strip_transformer_layers(
 
     print(layer_map)
 
-    # Update config with new number of layers
     setattr(config, layer_attr, len(remaining_layers))
 
     original_model = AutoModelForSequenceClassification.from_pretrained(model_name)
@@ -168,9 +159,8 @@ def strip_transformer_layers(
 
     print(stripped_dict.keys())
 
-    # # Load the modified state dict
     stripped_model.load_state_dict(stripped_dict)
-    # Verify layer equality if requested
+
     verification_results = None
     if verify:
         is_identical, verification_results = verify_layer_equality(
@@ -181,7 +171,6 @@ def strip_transformer_layers(
             print("Mismatched layers:", verification_results["mismatched_layers"])
             print("Weight differences:", verification_results["weight_differences"])
 
-    # Save the model if output directory is provided
     if output_dir:
         stripped_model.save_pretrained(output_dir)
         config.save_pretrained(output_dir)
@@ -190,10 +179,7 @@ def strip_transformer_layers(
 
 
 if __name__ == "__main__":
-    models_to_test = [
-        "/gpfs/helios/home/manuchek/mala/data/teacher_models/20-epochs/checkpoint-72460"
-    ]
-    # models_to_test = ["microsoft/deberta-v3-small"]
+    models_to_test = [""]  # teacher model
 
     for model_name in models_to_test:
         print(f"\nTesting model: {model_name}")
@@ -242,6 +228,4 @@ if __name__ == "__main__":
         print(original_model_predictions)
 
         print(original_model)
-        stripped_model.save_pretrained(
-            "/gpfs/helios/home/manuchek/mala/data/student_models/stripped-20-epochs"
-        )
+        stripped_model.save_pretrained("")  # saved student model

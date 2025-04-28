@@ -8,15 +8,14 @@ from tqdm import tqdm
 import json
 from datasets import Dataset, concatenate_datasets
 
-with open("/gpfs/helios/home/manuchek/mala/data/classes.json") as file:
+with open("") as file:  # classes path
     classes = json.load(file)["data"]
 
 class2id = {class_: id for id, class_ in enumerate(classes)}
 id2class = {id: class_ for class_, id in class2id.items()}
 
 
-train_file = "/gpfs/helios/home/manuchek/mala/data/train_valid_test_data/train/data-00000-of-00001.arrow"
-
+train_file = ""  # training data path
 tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v3-base")
 
 
@@ -57,7 +56,7 @@ def get_teacher_predictions(model, df, batch_size=32):
             outputs = model(input_ids=batch_ids, attention_mask=batch_mask)
 
             # Apply temperature scaling and softmax
-            temperature = 2.0  # Adjust this value as needed
+            temperature = 2.0  # Adjust temperature as needed
             logits = outputs.logits / temperature
             probs = torch.nn.functional.softmax(logits, dim=-1)
             all_probs.append(probs.cpu().numpy())
@@ -66,9 +65,7 @@ def get_teacher_predictions(model, df, batch_size=32):
 
 
 def main():
-    model = AutoModelForSequenceClassification.from_pretrained(
-        "/gpfs/helios/home/manuchek/mala/data/teacher_models/20-epochs/checkpoint-72460"
-    )
+    model = AutoModelForSequenceClassification.from_pretrained("")  # teacher model path
 
     train_dataset = Dataset.from_file(train_file)
 
@@ -83,7 +80,7 @@ def main():
     )
 
     train_dataset = train_dataset.add_column("soft_labels", soft_labels.tolist())
-    train_dataset.save_to_disk("/gpfs/helios/home/manuchek/mala/data/teacher_labels")
+    train_dataset.save_to_disk("")  # dataset that has teacher labels
 
 
 if __name__ == "__main__":

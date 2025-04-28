@@ -185,11 +185,4 @@ def main():
     combined_test_set.save_to_disk("mala/train_valid_test_data/test")
 
 
-# main()
-
-# for lang, path in lang_paths.items():
-#     for file_name in os.listdir(path):
-#         if file_name.startswith("cache"):
-#             os.remove(os.path.join(path, file_name))
-train = Dataset.from_file("mala/train_valid_test_data/train/data-00000-of-00001.arrow")
-print(len(train))
+main()
